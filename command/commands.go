@@ -10,6 +10,14 @@ func GetCommands() []*discordgo.ApplicationCommand {
 		{
 			Name:        "play",
 			Description: "Plays the song of the maincharacter",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "boost-level",
+					Description: "Sets the boost level of the maincharacter (1 or 2)",
+					Required:    false,
+				},
+			},
 		},
 		{
 			Name:        "stop",

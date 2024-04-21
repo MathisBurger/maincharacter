@@ -17,6 +17,8 @@ var buffer [][]byte = make([][]byte, 0)
 // GetPlayCommand gets the internal play command for the main character
 func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	guild, err := s.State.Guild(i.GuildID)
+
+	// ends current sessions on guild
 	if conn := internal.GetActiveVoiceSession(guild, s); conn != nil {
 		conn.Close()
 		conn.Disconnect()
@@ -24,12 +26,46 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if err != nil {
 		log.Println("Error getting guild data", err)
 	}
+
+	// Finds current user in voice channel
 	for j := range guild.VoiceStates {
-		if guild.VoiceStates[j].Member.User.ID == i.Member.User.ID {
-			buffer, err := loadSound()
-			if err != nil {
-				log.Println("Error loading sound", err)
+
+		// user is in voice channel
+		if guild.VoiceStates[j].Member != nil && guild.VoiceStates[j].Member.User.ID == i.Member.User.ID {
+			var buffer [][]byte = make([][]byte, 0)
+			options := i.ApplicationCommandData().Options
+
+			// sets the boost version dependent on data
+			if len(options) == 1 {
+				option := options[0].IntValue()
+				switch option {
+				case 1:
+					buffer, err = loadSound("audiofiles/boost_1.dca")
+					if err != nil {
+						log.Println("Error loading sound", err)
+					}
+					break
+				case 2:
+					buffer, err = loadSound("audiofiles/boost_2.dca")
+					if err != nil {
+						log.Println("Error loading sound", err)
+					}
+					break
+				default:
+					buffer, err = loadSound("audiofiles/maincharacter.dca")
+					if err != nil {
+						log.Println("Error loading sound", err)
+					}
+					break
+				}
+			} else {
+				buffer, err = loadSound("audiofiles/maincharacter.dca")
+				if err != nil {
+					log.Println("Error loading sound", err)
+				}
 			}
+
+			// Sends now playing message
 			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -39,12 +75,16 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if err != nil {
 				log.Println("Error interaction respond", err)
 			}
+
+			// Plays sound on voice channel
 			err = playSound(s, guild.ID, guild.VoiceStates[j].ChannelID, buffer)
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
+
+	// Send user not in voice channel message
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
@@ -57,9 +97,9 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 }
 
 // Loads the sound
-func loadSound() ([][]byte, error) {
+func loadSound(version string) ([][]byte, error) {
 
-	file, err := os.Open("audiofiles/maincharacter.dca")
+	file, err := os.Open(version)
 	if err != nil {
 		fmt.Println("Error opening dca file :", err)
 		return nil, err
