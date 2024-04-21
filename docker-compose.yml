@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  bot:
+    image: ghcr.io/mathisburger/maincharacter:latest
+    environment:
+      MAINCHARACTER_BOT_TOKEN: token
