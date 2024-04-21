@@ -6,6 +6,7 @@ import (
 	"log"
 	"maincharacter/command"
 	"maincharacter/internal"
+	"maincharacter/status"
 	"os"
 	"os/signal"
 )
@@ -36,10 +37,7 @@ func main() {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
 
-	err = discord.UpdateCustomStatus("Ist im Insi-Modus")
-	if err != nil {
-		log.Fatal(err)
-	}
+	go status.UpdateStatusWorker(discord)
 
 	command.RegisterCommands(discord)
 
