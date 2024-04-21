@@ -40,7 +40,7 @@ func CreateEventCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		Description:        "Hammer geiles ApoRED event meine Hasen",
 		ScheduledStartTime: &startDate,
 		ScheduledEndTime:   &endTime,
-		EntityType:         discordgo.GuildScheduledEventEntityTypeStageInstance,
+		EntityType:         discordgo.GuildScheduledEventEntityTypeExternal,
 		ChannelID:          i.ChannelID,
 		PrivacyLevel:       discordgo.GuildScheduledEventPrivacyLevelGuildOnly,
 	})

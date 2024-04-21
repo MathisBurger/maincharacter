@@ -10,6 +10,18 @@ var keywords = []string{
 	"burgi",
 	"red",
 	"insi",
+	"hasen",
+	"hasis",
+	"broke",
+	"broki",
+	"fick",
+	"cs",
+	"rush",
+	"a",
+	"b",
+	"mid",
+	"minecraft",
+	"fortnite",
 }
 
 var responses = []string{
@@ -18,6 +30,15 @@ var responses = []string{
 	"Willst du mich ficken?",
 	"Steuern meuern",
 	"Broki moki",
+	"Bin mies am Steuern sparen",
+	"Bin im Insi-Modus dikka",
+	"Wer bist du, dass du so mit APO RED dem Allerechten redest?",
+	"Hallo meine kleinen Hasis",
+	"RED is back",
+	"100k in meinem Prada bag",
+	"Fahre range",
+	"Meine Karre ist ein Batmobil digga",
+	"Heute neuer Prank auf meinem Main Channel, weil ich der Maincharacter bin dikka",
 }
 
 // Respondes to a message

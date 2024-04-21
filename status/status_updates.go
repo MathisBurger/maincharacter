@@ -40,7 +40,6 @@ var customStates = []string{
 
 // Updates the status of main character bot
 func UpdateStatusWorker(s *discordgo.Session) {
-
 	for {
 		stateType := rand.Intn(4)
 		switch stateType {
