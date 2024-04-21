@@ -51,6 +51,7 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 }
 
+// Loads the sound
 func loadSound() ([][]byte, error) {
 
 	file, err := os.Open("audiofiles/maincharacter.dca")
@@ -93,6 +94,7 @@ func loadSound() ([][]byte, error) {
 	}
 }
 
+// Plays a sound
 func playSound(s *discordgo.Session, guildID, channelID string, buffer [][]byte) (err error) {
 	vc, err := s.ChannelVoiceJoin(guildID, channelID, false, false)
 	if err != nil {

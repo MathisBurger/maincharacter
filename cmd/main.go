@@ -12,11 +12,15 @@ import (
 
 // Application entrypoint
 func main() {
+
+	// Load config
 	var config internal.Config
 	err := envconfig.Process("maincharacter", &config)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Create app
 	discord, err := discordgo.New("Bot " + config.BotToken)
 	if err != nil {
 		log.Fatal(err)
@@ -26,11 +30,6 @@ func main() {
 	})
 
 	discord.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
-
-	//err = command.LoadSound()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	err = discord.Open()
 	if err != nil {
@@ -42,22 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	commands := command.GetCommands()
-	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
-	for i, v := range commands {
-		cmd, err := discord.ApplicationCommandCreate(discord.State.User.ID, "", v)
-		if err != nil {
-			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
-		}
-		registeredCommands[i] = cmd
-	}
-
-	commandHandlers := command.GetCommandHandlers()
-	discord.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
-		}
-	})
+	command.RegisterCommands(discord)
 
 	defer discord.Close()
 
