@@ -23,6 +23,42 @@ func GetCommands() []*discordgo.ApplicationCommand {
 			Name:        "was-rushen",
 			Description: "Apored sagt dir was alles gerusht werden soll",
 		},
+		{
+			Name:        "create-event",
+			Description: "Creates a new event",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "name",
+					Description: "Der Name des Events",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "start-date",
+					Description: "Startdatum im Format 1.1.1990",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "start-hours",
+					Description: "Startzeit stunden",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "start-min",
+					Description: "Startzeit minuten",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "duration",
+					Description: "Dauer in Stunden",
+					Required:    true,
+				},
+			},
+		},
 	}
 }
 
@@ -31,9 +67,10 @@ func GetCommandHandlers() map[string]func(s *discordgo.Session, i *discordgo.Int
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 
 		// The functionality of the play command
-		"play":       GetPlayCommand,
-		"stop":       StopCommand,
-		"move":       MoveCommand,
-		"was-rushen": RushCommand,
+		"play":         GetPlayCommand,
+		"stop":         StopCommand,
+		"move":         MoveCommand,
+		"was-rushen":   RushCommand,
+		"create-event": CreateEventCommand,
 	}
 }
