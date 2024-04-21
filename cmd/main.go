@@ -25,9 +25,15 @@ func main() {
 	discord.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
+	discord.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
 	err = discord.Open()
 	if err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
+	}
+
+	err = discord.UpdateCustomStatus("Ist im Insi-Modus")
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	commands := command.GetCommands()
