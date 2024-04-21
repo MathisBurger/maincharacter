@@ -4,4 +4,6 @@ services:
   bot:
     image: ghcr.io/mathisburger/maincharacter:latest
     environment:
-      MAINCHARACTER_BOT_TOKEN: token
+      MAINCHARACTER_BOTTOKEN: token
+    volumes:
+      - ./audiofiles:/app/audiofiles
