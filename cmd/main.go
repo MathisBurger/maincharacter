@@ -6,6 +6,7 @@ import (
 	"log"
 	"maincharacter/command"
 	"maincharacter/internal"
+	"maincharacter/message"
 	"maincharacter/status"
 	"os"
 	"os/signal"
@@ -26,11 +27,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	discord.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
+	discord.AddHandler(message.MessageResponder)
 
-	discord.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
+	discord.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates | discordgo.IntentsMessageContent
 
 	err = discord.Open()
 	if err != nil {
