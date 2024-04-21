@@ -12,6 +12,15 @@ func GetVoiceChannelID(guild *discordgo.Guild, userID string) string {
 	return ""
 }
 
+func GetActiveVoiceSession(guild *discordgo.Guild, s *discordgo.Session) *discordgo.VoiceConnection {
+	for _, conn := range s.VoiceConnections {
+		if conn.GuildID == guild.ID {
+			return conn
+		}
+	}
+	return nil
+}
+
 func AllVoiceStatesExcept(guild *discordgo.Guild, userID string) []*discordgo.VoiceState {
 	var states []*discordgo.VoiceState
 	for _, v := range guild.VoiceStates {

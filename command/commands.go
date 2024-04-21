@@ -12,6 +12,10 @@ func GetCommands() []*discordgo.ApplicationCommand {
 			Description: "Plays the song of the maincharacter",
 		},
 		{
+			Name:        "stop",
+			Description: "Stops the song",
+		},
+		{
 			Name:        "move",
 			Description: "Moves all users to the pinging user",
 		},
@@ -28,6 +32,7 @@ func GetCommandHandlers() map[string]func(s *discordgo.Session, i *discordgo.Int
 
 		// The functionality of the play command
 		"play":       GetPlayCommand,
+		"stop":       StopCommand,
 		"move":       MoveCommand,
 		"was-rushen": RushCommand,
 	}

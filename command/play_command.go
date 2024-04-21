@@ -7,6 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"io"
 	"log"
+	"maincharacter/internal"
 	"os"
 	"time"
 )
@@ -16,6 +17,10 @@ var buffer [][]byte = make([][]byte, 0)
 // GetPlayCommand gets the internal play command for the main character
 func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	guild, err := s.State.Guild(i.GuildID)
+	if conn := internal.GetActiveVoiceSession(guild, s); conn != nil {
+		conn.Close()
+		conn.Disconnect()
+	}
 	if err != nil {
 		log.Println("Error getting guild data", err)
 	}
@@ -25,18 +30,18 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if err != nil {
 				log.Println("Error loading sound", err)
 			}
-			err = playSound(s, guild.ID, guild.VoiceStates[j].ChannelID, buffer)
-			if err != nil {
-				log.Fatal(err)
-			}
 			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Jo APO RED der maker master hat dir jetzt von seinem Leben erzählt",
+					Content: "Jo APO RED der maker master erzählt dir jetzt von seinem Leben",
 				},
 			})
 			if err != nil {
 				log.Println("Error interaction respond", err)
+			}
+			err = playSound(s, guild.ID, guild.VoiceStates[j].ChannelID, buffer)
+			if err != nil {
+				log.Fatal(err)
 			}
 		}
 	}
@@ -109,7 +114,6 @@ func playSound(s *discordgo.Session, guildID, channelID string, buffer [][]byte)
 	if err != nil {
 		return err
 	}
-	println(buffer)
 
 	// Send the buffer data.
 	for _, buff := range buffer {
