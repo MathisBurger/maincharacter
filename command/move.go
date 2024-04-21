@@ -28,6 +28,7 @@ func MoveCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	for _, state := range states {
 		err := s.GuildMemberMove(state.GuildID, state.UserID, &channelID)
 		if err != nil {
+			log.Fatal(err)
 			return
 		}
 	}
