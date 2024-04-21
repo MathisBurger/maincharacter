@@ -38,43 +38,72 @@ var customStates = []string{
 	"ist der Maincharacter",
 }
 
+// Idle states of status updates
+var idle0 = 0
+var idle1 = 1
+
 // Updates the status of main character bot
-func UpdateStatusWorker(s *discordgo.Session) {
+func UpdateStatusWorker(c chan *discordgo.Activity) {
+	var activity *discordgo.Activity = nil
 	for {
 		stateType := rand.Intn(4)
 		switch stateType {
 		case 0:
-			s.UpdateListeningStatus(listeningStates[rand.Intn(len(listeningStates))])
+			activity = &discordgo.Activity{Type: discordgo.ActivityTypeListening, Name: listeningStates[rand.Intn(len(listeningStates))]}
 			break
 		case 1:
-			s.UpdateWatchStatus(1, watchingStates[rand.Intn(len(watchingStates))])
+			activity = &discordgo.Activity{Type: discordgo.ActivityTypeWatching, Name: watchingStates[rand.Intn(len(watchingStates))]}
 			break
 		case 2:
-			s.UpdateGameStatus(1, gameStates[rand.Intn(len(gameStates))])
+			activity = &discordgo.Activity{Type: discordgo.ActivityTypeGame, Name: gameStates[rand.Intn(len(gameStates))]}
 			break
 		case 3:
-			s.UpdateCustomStatus(customStates[rand.Intn(len(customStates))])
+			activity = &discordgo.Activity{Type: discordgo.ActivityTypeCustom, State: customStates[rand.Intn(len(customStates))], Name: "custom status"}
 			break
 
 		}
-		time.Sleep(10 * time.Second)
+		c <- activity
+		i := 0
+
+		// Sends every second empty activity
+		// After 10 seconds the activity is reset
+		for i < 10 {
+			i++
+			c <- activity
+			time.Sleep(1 * time.Second)
+		}
 	}
 }
 
-func UpdateGuildDoNotDisrupt(s *discordgo.Session) {
+func UpdateGuildDoNotDisrupt(s *discordgo.Session, c chan *discordgo.Activity) {
+	var activity *discordgo.Activity = nil
 	for {
+		activity = <-c
+
+		// Sets the idle states in dependence of
+		// the activity type of the activity from channel
+		idle := &idle1
+		if activity.Type == discordgo.ActivityTypeCustom {
+			idle = nil
+		} else if activity.Type == discordgo.ActivityTypeListening {
+			idle = &idle0
+		}
+
 		voiceConns := s.VoiceConnections
 		if len(voiceConns) > 0 {
 			s.UpdateStatusComplex(discordgo.UpdateStatusData{
-				AFK:    false,
-				Status: string(discordgo.StatusDoNotDisturb),
+				AFK:        false,
+				Activities: []*discordgo.Activity{activity},
+				Status:     string(discordgo.StatusDoNotDisturb),
+				IdleSince:  idle,
 			})
 		} else {
 			s.UpdateStatusComplex(discordgo.UpdateStatusData{
-				AFK:    false,
-				Status: string(discordgo.StatusOnline),
+				AFK:        false,
+				Activities: []*discordgo.Activity{activity},
+				Status:     string(discordgo.StatusOnline),
+				IdleSince:  idle,
 			})
 		}
-		time.Sleep(1 * time.Second)
 	}
 }

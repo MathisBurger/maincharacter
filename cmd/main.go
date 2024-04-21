@@ -42,8 +42,9 @@ func main() {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
 
-	go status.UpdateStatusWorker(discord)
-	go status.UpdateGuildDoNotDisrupt(discord)
+	statusChannel := make(chan *discordgo.Activity)
+	go status.UpdateStatusWorker(statusChannel)
+	go status.UpdateGuildDoNotDisrupt(discord, statusChannel)
 
 	command.RegisterCommands(discord)
 

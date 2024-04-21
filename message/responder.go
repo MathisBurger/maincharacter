@@ -17,8 +17,6 @@ var keywords = []string{
 	"fick",
 	"cs",
 	"rush",
-	"a",
-	"b",
 	"mid",
 	"minecraft",
 	"fortnite",
@@ -43,6 +41,9 @@ var responses = []string{
 
 // Respondes to a message
 func MessageResponder(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Author.ID == s.State.User.ID {
+		return
+	}
 	if strings.ToLower(m.Content) == "rush a" {
 		s.ChannelMessageSend(m.ChannelID, "Alter, Rush A? Digga, das ist voll mein Ding! Einfach rein in die Action, volle Power voraus! Keine Zeit für Smalltalk, wir ballern uns durch, als ob es kein Morgen gäbe. Krass, wie das Adrenalin durch meine Adern pumpt, wenn ich mit Vollgas vorpresche! Echt jetzt, das ist der ultimative Kick! Wer kommt mit? Let's go, meine Gönner!")
 	}
