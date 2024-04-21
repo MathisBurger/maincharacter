@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"io"
@@ -10,7 +11,7 @@ import (
 	"time"
 )
 
-var buffer = make([][]byte, 0)
+var buffer [][]byte = make([][]byte, 0)
 
 // GetPlayCommand gets the internal play command for the main character
 func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -20,7 +21,23 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 	for j := range guild.VoiceStates {
 		if guild.VoiceStates[j].Member.User.ID == i.Member.User.ID {
-
+			buffer, err := loadSound()
+			if err != nil {
+				log.Println("Error loading sound", err)
+			}
+			err = playSound(s, guild.ID, guild.VoiceStates[j].ChannelID, buffer)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Jo APO RED der maker master hat dir jetzt von seinem Leben erzählt",
+				},
+			})
+			if err != nil {
+				log.Println("Error interaction respond", err)
+			}
 		}
 	}
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -34,12 +51,12 @@ func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 }
 
-func loadSound() error {
+func loadSound() ([][]byte, error) {
 
-	file, err := os.Open("maincharacter.dca")
+	file, err := os.Open("audiofiles/maincharacter.dca")
 	if err != nil {
 		fmt.Println("Error opening dca file :", err)
-		return err
+		return nil, err
 	}
 
 	var opuslen int16
@@ -49,19 +66,18 @@ func loadSound() error {
 		err = binary.Read(file, binary.LittleEndian, &opuslen)
 
 		// If this is the end of the file, just return.
-		if err == io.EOF || err == io.ErrUnexpectedEOF {
+		if err == io.EOF || errors.Is(err, io.ErrUnexpectedEOF) {
 			err := file.Close()
 			if err != nil {
-				return err
+				return nil, err
 			}
-			return nil
+			return buffer, nil
 		}
 
 		if err != nil {
 			fmt.Println("Error reading from dca file :", err)
-			return err
+			return nil, err
 		}
-
 		// Read encoded pcm from dca file.
 		InBuf := make([]byte, opuslen)
 		err = binary.Read(file, binary.LittleEndian, &InBuf)
@@ -69,7 +85,7 @@ func loadSound() error {
 		// Should not be any end of file errors
 		if err != nil {
 			fmt.Println("Error reading from dca file :", err)
-			return err
+			return nil, err
 		}
 
 		// Append encoded pcm data to the buffer.
@@ -77,8 +93,8 @@ func loadSound() error {
 	}
 }
 
-func playSound(s *discordgo.Session, guildID, channelID string) (err error) {
-	vc, err := s.ChannelVoiceJoin(guildID, channelID, false, true)
+func playSound(s *discordgo.Session, guildID, channelID string, buffer [][]byte) (err error) {
+	vc, err := s.ChannelVoiceJoin(guildID, channelID, false, false)
 	if err != nil {
 		return err
 	}
@@ -91,6 +107,7 @@ func playSound(s *discordgo.Session, guildID, channelID string) (err error) {
 	if err != nil {
 		return err
 	}
+	println(buffer)
 
 	// Send the buffer data.
 	for _, buff := range buffer {

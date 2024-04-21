@@ -1,9 +1,8 @@
 package main
 
 import (
-	"context"
 	"github.com/bwmarrin/discordgo"
-	"github.com/sethvargo/go-envconfig"
+	"github.com/kelseyhightower/envconfig"
 	"log"
 	"maincharacter/command"
 	"maincharacter/internal"
@@ -13,19 +12,26 @@ import (
 
 // Application entrypoint
 func main() {
-	ctx := context.Background()
 	var config internal.Config
-	if err := envconfig.Process(ctx, &config); err != nil {
+	err := envconfig.Process("maincharacter", &config)
+	if err != nil {
 		log.Fatal(err)
 	}
-	discord, err := discordgo.New("Bot " + config.DiscordGoToken)
+	discord, err := discordgo.New("Bot " + config.BotToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 	discord.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
+
 	discord.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates
+
+	//err = command.LoadSound()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = discord.Open()
 	if err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
