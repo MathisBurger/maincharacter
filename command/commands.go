@@ -15,6 +15,10 @@ func GetCommands() []*discordgo.ApplicationCommand {
 			Name:        "move",
 			Description: "Moves all users to the pinging user",
 		},
+		{
+			Name:        "was-rushen",
+			Description: "Apored sagt dir was alles gerusht werden soll",
+		},
 	}
 }
 
@@ -23,7 +27,8 @@ func GetCommandHandlers() map[string]func(s *discordgo.Session, i *discordgo.Int
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 
 		// The functionality of the play command
-		"play": GetPlayCommand,
-		"move": MoveCommand,
+		"play":       GetPlayCommand,
+		"move":       MoveCommand,
+		"was-rushen": RushCommand,
 	}
 }
