@@ -31,6 +31,8 @@ func main() {
 	discord.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
+
+	// Add message responder
 	discord.AddHandler(message.MessageResponder)
 
 	discord.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildVoiceStates | discordgo.IntentsMessageContent
@@ -41,6 +43,7 @@ func main() {
 	}
 
 	go status.UpdateStatusWorker(discord)
+	go status.UpdateGuildDoNotDisrupt(discord)
 
 	command.RegisterCommands(discord)
 

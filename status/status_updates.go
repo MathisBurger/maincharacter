@@ -61,3 +61,21 @@ func UpdateStatusWorker(s *discordgo.Session) {
 		time.Sleep(10 * time.Second)
 	}
 }
+
+func UpdateGuildDoNotDisrupt(s *discordgo.Session) {
+	for {
+		voiceConns := s.VoiceConnections
+		if len(voiceConns) > 0 {
+			s.UpdateStatusComplex(discordgo.UpdateStatusData{
+				AFK:    false,
+				Status: string(discordgo.StatusDoNotDisturb),
+			})
+		} else {
+			s.UpdateStatusComplex(discordgo.UpdateStatusData{
+				AFK:    false,
+				Status: string(discordgo.StatusOnline),
+			})
+		}
+		time.Sleep(1 * time.Second)
+	}
+}
