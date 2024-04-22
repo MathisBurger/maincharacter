@@ -12,8 +12,6 @@ import (
 	"time"
 )
 
-var buffer [][]byte = make([][]byte, 0)
-
 // GetPlayCommand gets the internal play command for the main character
 func GetPlayCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	guild, err := s.State.Guild(i.GuildID)
@@ -105,6 +103,7 @@ func loadSound(version string) ([][]byte, error) {
 		return nil, err
 	}
 
+	var buffer [][]byte = make([][]byte, 0)
 	var opuslen int16
 
 	for {
